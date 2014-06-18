@@ -32,7 +32,6 @@ mapIth index f g xs =
     in
     helper 0 xs
 
-
 randomMix :: (Functor m, MonadRandom m)
           => [Color]
           -> Double {- "grey control" -}
