@@ -3,29 +3,29 @@
 import Control.Applicative((<$>))
 import Control.Monad.Random.Class
 
-data Color = Color Int Int Int deriving Show
+data ColorRGB = ColorRGB Int Int Int deriving Show
 
-getR :: Color -> Int
-getR (Color r _ _) = r
+getR :: ColorRGB -> Int
+getR (ColorRGB r _ _) = r
 
-getG :: Color -> Int
-getG (Color _ g _) = g
+getG :: ColorRGB -> Int
+getG (ColorRGB _ g _) = g
 
-getB :: Color -> Int
-getB (Color _ _ b) = b
+getB :: ColorRGB -> Int
+getB (ColorRGB _ _ b) = b
 
-mapColor :: (Int -> Int) -> (Color -> Color)
-mapColor f (Color r g b) = mkColor (f r, f g, f b)
+mapColorRGB :: (Int -> Int) -> (ColorRGB -> ColorRGB)
+mapColorRGB f (ColorRGB r g b) = mkColorRGB (f r, f g, f b)
 
-average :: Color -> Float
-average (Color r g b) = (fromIntegral (r + g + b)) / 3.0
+average :: ColorRGB -> Float
+average (ColorRGB r g b) = (fromIntegral (r + g + b)) / 3.0
 
-mkColor :: (Int, Int, Int) -> Color
-mkColor (r, g, b) = Color (bound r) (bound g) (bound b)
+mkColorRGB :: (Int, Int, Int) -> ColorRGB
+mkColorRGB (r, g, b) = ColorRGB (bound r) (bound g) (bound b)
     where bound x = min (max x 0) 255
 
-mkColorD :: (Double, Double, Double) -> Color
-mkColorD (r, g, b) = mkColor (truncate r, truncate g, truncate b)
+mkColorRGBd :: (Double, Double, Double) -> ColorRGB
+mkColorRGBd (r, g, b) = mkColorRGB (truncate r, truncate g, truncate b)
 
 
 triple :: [a] -> [(a, a, a)]
