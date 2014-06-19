@@ -1,5 +1,24 @@
 ﻿module Graphics.Colorful.Utils where
 
+import Control.Applicative((<$>))
+
+triple :: [a] -> [(a, a, a)]
+triple (x:y:z:xs) = (x, y, z): triple xs
+triple _ = []
+
+bound :: Ord a => a -> a -> a -> a
+bound min' max' = min max' . max min'
+
+if' :: a -> a -> Bool -> a
+if' f t b = if b then t else f
+
+(<$$>) :: Functor f => f a -> (a -> b) -> f b
+(<$$>) x f = f <$> x
+
+uncurry3 :: (a -> b -> c -> d) -> ((a, b, c) -> d)
+uncurry3 f = (\(x, y, z) -> f x y z)
+
+
 
 data ColorRGB = ColorRGB Int Int Int deriving Show
 
@@ -28,6 +47,15 @@ mkColorRGBd r g b = mkColorRGB (truncate r) (truncate g) (truncate b)
 data ColorHSL = ColorHSL Double Double Double
 
 
+getH :: ColorHSL -> Double
+getH (ColorHSL h _ _) = h
+
+getS :: ColorHSL -> Double
+getS (ColorHSL _ s _) = s
+
+getL :: ColorHSL -> Double
+getL (ColorHSL _ _ l) = l
+
 mkColorHSL :: Double -> Double -> Double -> ColorHSL
 mkColorHSL h s l = ColorHSL (bound' h) (bound' s) (bound' l)
     where bound' = bound 0.0 1.0
@@ -53,8 +81,8 @@ toHSL (ColorRGB r g b) =
          in
          mkColorHSL (h/6.0) s l
 
-fromHsl :: ColorHSL -> ColorRGB
-fromHsl (ColorHSL h s l) =
+fromHSL :: ColorHSL -> ColorRGB
+fromHSL (ColorHSL h s l) =
     let q = if (l < 0.5) then l * (1 + s) else l + s - l * s
         p = 2 * l - q
         r = hueToRGB p q (h + 1/3)
@@ -76,15 +104,23 @@ fromHsl (ColorHSL h s l) =
                   | t > 1 -> t - 1
                   | otherwise -> t
 
-bound :: Ord a => a -> a -> a -> a
-bound min' max' = min max' . max min'
 
-triple :: [a] -> [(a, a, a)]
-triple (x:y:z:xs) = (x, y, z): triple xs
-triple _ = []
 
-if' :: a -> a -> Bool -> a
-if' f t b = if b then t else f
+class Color m where
+    getX :: m -> Double
+    getY :: m -> Double
+    getZ :: m -> Double
+    mkColor :: Double -> Double -> Double -> m
 
-uncurry3 :: (a -> b -> c -> d) -> ((a, b, c) -> d)
-uncurry3 f = (\(x, y, z) -> f x y z)
+instance Color ColorRGB where
+    getX = fromIntegral . getR
+    getY = fromIntegral . getG
+    getZ = fromIntegral . getB
+    mkColor = mkColorRGBd
+
+instance Color ColorHSL where
+    getX = getH
+    getY = getS
+    getZ = getL
+    mkColor = mkColorHSL
+
