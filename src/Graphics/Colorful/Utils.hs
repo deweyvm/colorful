@@ -19,6 +19,14 @@ uncurry3 :: (a -> b -> c -> d) -> ((a, b, c) -> d)
 uncurry3 f = (\(x, y, z) -> f x y z)
 
 
+mapIth :: Int -> (a -> b) -> (a -> b) -> [a] -> [b]
+mapIth index f g xs =
+    let helper i (y:ys) =
+          let h = if' f g (i == index) in
+          h y : helper (i+1) ys
+        helper _ [] = []
+    in
+    helper 0 xs
 
 data ColorRGB = ColorRGB Int Int Int deriving Show
 
@@ -31,11 +39,11 @@ getG (ColorRGB _ g _) = g
 getB :: ColorRGB -> Int
 getB (ColorRGB _ _ b) = b
 
-mapColorRGB :: (Int -> Int) -> (ColorRGB -> ColorRGB)
-mapColorRGB f (ColorRGB r g b) = mkColorRGB (f r) (f g) (f b)
+mapColor :: Color a => (Double -> Double) -> (a -> a)
+mapColor f c = mkColor (f $ getX c) (f $ getY c) (f $ getZ c)
 
-average :: ColorRGB -> Float
-average (ColorRGB r g b) = (fromIntegral (r + g + b)) / 3.0
+average :: Color c => c -> Double
+average c = (getX c + getY c + getZ c) / 3.0
 
 mkColorRGB :: Int -> Int -> Int -> ColorRGB
 mkColorRGB r g b = ColorRGB (bound' r) (bound' g) (bound' b)
