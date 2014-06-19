@@ -8,7 +8,7 @@ import Graphics.Colorful.Utils
 uniform :: (Functor m, MonadRandom m) => Int -> m [ColorRGB]
 uniform n = do
     rgbs <- triple <$> getRandomRs (0, 255)
-    return $ take n $ mkColorRGB <$> rgbs
+    return $ take n $ uncurry3 mkColorRGB <$> rgbs
 
 withOffset :: (Functor m, MonadRandom m)
            => Float
@@ -47,7 +47,7 @@ randomMix cs g = do
     let sum' = sum $ ratios
     let divRatios = (/sum') <$> ratios
     let mult f  = sum $ (\c -> sum $ (fromIntegral (f c) *) <$> divRatios) <$> cs
-    return $ mkColorRGBd (mult getR, mult getG, mult getB)
+    return $ mkColorRGBd (mult getR) (mult getG) (mult getB)
 
 colorTriad :: (Functor m, MonadRandom m)
            => ColorRGB
@@ -56,3 +56,4 @@ colorTriad :: (Functor m, MonadRandom m)
            -> Double
            -> m ColorRGB
 colorTriad c1 c2 c3 = randomMix [c1, c2, c3]
+
