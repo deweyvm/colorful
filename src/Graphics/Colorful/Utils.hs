@@ -50,9 +50,14 @@ mkColorRGB r g b = ColorRGB (bound' r) (bound' g) (bound' b)
     where bound' = bound 0 255
 
 mkColorRGBd :: Double -> Double -> Double -> ColorRGB
-mkColorRGBd r g b = mkColorRGB (truncate r) (truncate g) (truncate b)
+mkColorRGBd r g b =
+    mkColorRGB (truncate (r*256))
+               (truncate (g*256))
+               (truncate (b*256))
 
-data ColorHSL = ColorHSL Double Double Double
+
+
+data ColorHSL = ColorHSL Double Double Double deriving Show
 
 
 getH :: ColorHSL -> Double
@@ -97,7 +102,7 @@ fromHSL (ColorHSL h s l) =
         g = hueToRGB p q h
         b = hueToRGB p q (h - 1/3)
     in
-    mkColorRGBd (r*256) (g*256) (b*256)
+    mkColorRGBd r g b
 
     where hueToRGB p q t =
               let t' = wrapT t in
